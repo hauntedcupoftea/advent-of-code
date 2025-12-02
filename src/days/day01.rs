@@ -31,23 +31,25 @@ fn part1(input: &str) -> i32 {
 fn part2(input: &str) -> i32 {
     let mut current_pos: i32 = 50;
     let mut total_zero_hits = 0;
-    let dial_size:i32 = 100;
+    let dial_size: i32 = 100;
 
     for line in input.lines() {
         let is_right = line.starts_with('R');
         let magnitude: i32 = line[1..].parse().unwrap();
-        
+
         let previous_pos = current_pos;
-        
+
         if is_right {
             current_pos += magnitude;
-            total_zero_hits += current_pos.div_euclid(dial_size) - previous_pos.div_euclid(dial_size);
+            total_zero_hits +=
+                current_pos.div_euclid(dial_size) - previous_pos.div_euclid(dial_size);
         } else {
             current_pos -= magnitude;
-            total_zero_hits += (previous_pos - 1).div_euclid(dial_size) - (current_pos - 1).div_euclid(dial_size);
+            total_zero_hits +=
+                (previous_pos - 1).div_euclid(dial_size) - (current_pos - 1).div_euclid(dial_size);
         }
     }
-    
+
     total_zero_hits
 }
 
