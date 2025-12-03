@@ -1,3 +1,5 @@
+const DIAL_SIZE: i32 = 100;
+
 pub fn run(input: &str) {
     let part1_result = part1(input);
     println!("Part 1: {}", part1_result);
@@ -9,7 +11,6 @@ pub fn run(input: &str) {
 fn part1(input: &str) -> i32 {
     let mut current_position: i32 = 50;
     let mut result: i32 = 0;
-    let dial_size: i32 = 100;
     for (idx, line) in input.lines().enumerate() {
         let positive: bool = line.chars().nth(0) == Some('R');
         let magnitude: i32 = match line[1..].parse() {
@@ -20,7 +21,7 @@ fn part1(input: &str) -> i32 {
             }
         };
         let dial_operation = if positive { magnitude } else { -magnitude };
-        current_position = (current_position + dial_operation + dial_size) % dial_size;
+        current_position = (current_position + dial_operation + DIAL_SIZE) % DIAL_SIZE;
         if current_position == 0 {
             result += 1
         }
@@ -31,8 +32,6 @@ fn part1(input: &str) -> i32 {
 fn part2(input: &str) -> i32 {
     let mut current_pos: i32 = 50;
     let mut total_zero_hits = 0;
-    let dial_size: i32 = 100;
-
     for line in input.lines() {
         let is_right = line.starts_with('R');
         let magnitude: i32 = line[1..].parse().unwrap();
@@ -42,11 +41,11 @@ fn part2(input: &str) -> i32 {
         if is_right {
             current_pos += magnitude;
             total_zero_hits +=
-                current_pos.div_euclid(dial_size) - previous_pos.div_euclid(dial_size);
+                current_pos.div_euclid(DIAL_SIZE) - previous_pos.div_euclid(DIAL_SIZE);
         } else {
             current_pos -= magnitude;
             total_zero_hits +=
-                (previous_pos - 1).div_euclid(dial_size) - (current_pos - 1).div_euclid(dial_size);
+                (previous_pos - 1).div_euclid(DIAL_SIZE) - (current_pos - 1).div_euclid(DIAL_SIZE);
         }
     }
 

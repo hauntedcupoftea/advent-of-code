@@ -6,9 +6,8 @@ pub fn run(input: &str) {
     println!("Part 2: {}", part2_result);
 }
 
-fn part1(input: &str) -> i64 {
-    let mut total_ids: i64 = 0;
-    let ranges: Vec<(i64, i64)> = input
+fn process_input(input: &str) -> Vec<(i64, i64)> {
+    input
         .split(',')
         .filter_map(|x| {
             let (start, end) = x.split_once('-').expect("Invalid range.");
@@ -17,7 +16,12 @@ fn part1(input: &str) -> i64 {
                 end.parse().expect("Invalid end"),
             ))
         })
-        .collect();
+        .collect()
+}
+
+fn part1(input: &str) -> i64 {
+    let mut total_ids: i64 = 0;
+    let ranges = process_input(input);
     for (start, end) in ranges {
         for n in start..=end {
             let l = n.checked_ilog10().unwrap_or(0) + 1;
@@ -32,18 +36,9 @@ fn part1(input: &str) -> i64 {
     total_ids
 }
 
-fn part2(input: &str) -> u64 {
-    let mut total_ids: u64 = 0;
-    let ranges: Vec<(u64, u64)> = input
-        .split(',')
-        .filter_map(|x| {
-            let (start, end) = x.split_once('-').expect("Invalid range.");
-            Some((
-                start.parse().expect("Invalid start"),
-                end.parse().expect("Invalid end"),
-            ))
-        })
-        .collect();
+fn part2(input: &str) -> i64 {
+    let mut total_ids: i64 = 0;
+    let ranges = process_input(input);
     for (start, end) in ranges {
         for i in start..=end {
             if _is_invalid(i) {
@@ -54,14 +49,14 @@ fn part2(input: &str) -> u64 {
     total_ids
 }
 
-fn _is_invalid(n: u64) -> bool {
+fn _is_invalid(n: i64) -> bool {
     let len = n.checked_ilog10().unwrap_or(0) + 1;
     for p_len in 1..=(len / 2) {
         if len % p_len != 0 {
             continue;
         }
-        let numerator = 10_u64.pow(len) - 1;
-        let denominator = 10_u64.pow(p_len) - 1;
+        let numerator = 10_i64.pow(len) - 1;
+        let denominator = 10_i64.pow(p_len) - 1;
         let mask = numerator / denominator;
 
         if n % mask == 0 {
