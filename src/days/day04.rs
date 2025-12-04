@@ -6,78 +6,114 @@ pub fn run(input: &str) {
     println!("Part 2: {}", part2_result);
 }
 
-fn process_input(input: &str) -> Vec<(i64, i64)> {
-    input
-        .split(',')
-        .filter_map(|x| {
-            let (start, end) = x.split_once('-').expect("Invalid range.");
-            Some((
-                start.parse().expect("Invalid start"),
-                end.parse().expect("Invalid end"),
-            ))
-        })
-        .collect()
+fn process_input(input: &str) -> Vec<Vec<char>> {
+    input.lines().map(|x| x.chars().collect()).collect()
 }
 
 fn part1(input: &str) -> i64 {
-    let mut total_ids: i64 = 0;
-    let ranges = process_input(input);
-    for (start, end) in ranges {
-        for n in start..=end {
-            let l = n.checked_ilog10().unwrap_or(0) + 1;
-            if l % 2 != 0 {
+    let grid = process_input(input);
+    let height = grid.len() as isize;
+    let width = grid[0].len() as isize;
+    let mut total_kept = 0;
+
+    for r in 0..height {
+        for c in 0..width {
+            if grid[r as usize][c as usize] != '@' {
                 continue;
             }
-            if n % (10_i64.pow(l / 2) as i64 + 1) == 0 {
-                total_ids += n;
+            let mut adjacent_count = 0;
+
+            for dy in -1..=1 {
+                for dx in -1..=1 {
+                    if dy == 0 && dx == 0 {
+                        continue;
+                    }
+                    let nr = r + dy;
+                    let nc = c + dx;
+                    if nr >= 0 && nr < height && nc >= 0 && nc < width {
+                        if grid[nr as usize][nc as usize] == '@' {
+                            adjacent_count += 1;
+                        }
+                    }
+                }
+            }
+            if adjacent_count < 4 {
+                total_kept += 1;
             }
         }
     }
-    total_ids
+    total_kept
 }
 
 fn part2(input: &str) -> i64 {
-    let mut total_ids: i64 = 0;
-    let ranges = process_input(input);
-    for (start, end) in ranges {
-        for i in start..=end {
-            if _is_invalid(i) {
-                total_ids += i;
+    let mut grid = process_input(input);
+    let height = grid.len() as isize;
+    let width = grid[0].len() as isize;
+    let mut total_removed = 0;
+
+    loop {
+        let mut total_removed_this_pass = 0;
+
+        for r in 0..height {
+            for c in 0..width {
+                if grid[r as usize][c as usize] != '@' {
+                    continue;
+                }
+                let mut adjacent_count = 0;
+
+                for dy in -1..=1 {
+                    for dx in -1..=1 {
+                        if dy == 0 && dx == 0 {
+                            continue;
+                        }
+                        let nr = r + dy;
+                        let nc = c + dx;
+                        if nr >= 0 && nr < height && nc >= 0 && nc < width {
+                            if grid[nr as usize][nc as usize] == '@' {
+                                adjacent_count += 1;
+                            }
+                        }
+                    }
+                }
+                if adjacent_count < 4 {
+                    total_removed_this_pass += 1;
+                    grid[r as usize][c as usize] = 'x';
+                }
             }
         }
-    }
-    total_ids
-}
 
-fn _is_invalid(n: i64) -> bool {
-    let len = n.checked_ilog10().unwrap_or(0) + 1;
-    for p_len in 1..=(len / 2) {
-        if len % p_len != 0 {
-            continue;
+        if total_removed_this_pass == 0 {
+            break;
         }
-        let numerator = 10_i64.pow(len) - 1;
-        let denominator = 10_i64.pow(p_len) - 1;
-        let mask = numerator / denominator;
 
-        if n % mask == 0 {
-            return true;
-        }
+        total_removed += total_removed_this_pass;
     }
-    false
+    total_removed
 }
 
 #[cfg(test)]
 mod tests {
     use super::{part1, part2};
-    const TEST_INPUT: &str = "11-22,95-115,998-1012,1188511880-1188511890,222220-222224,1698522-1698528,446443-446449,38593856-38593862,565653-565659,824824821-824824827,2121212118-2121212124";
+    const TEST_INPUT: &str = "
+..@@.@@@@.
+@@@.@.@.@@
+@@@@@.@.@@
+@.@@@@..@.
+@@.@@@@.@@
+.@@@@@@@.@
+.@.@.@.@@@
+@.@@@.@@@@
+.@@@@@@@@.
+@.@.@@@.@.
+";
 
     #[test]
     fn test_part1() {
-        assert_eq!(part1(TEST_INPUT), 1227775554);
+        assert_eq!(part1(TEST_INPUT), 13);
     }
 
     #[test]
     fn test_part2() {
-        assert_eq!(part2(TEST_INPUT), 4174379265);
+        assert_eq!(part2(TEST_INPUT), 43);
     }
 }
