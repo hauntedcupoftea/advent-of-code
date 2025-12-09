@@ -52,9 +52,6 @@ fn part1(input: &str) -> u128 {
 
 fn part2(input: &str) -> u128 {
     let lines: Vec<&str> = input.lines().collect();
-    for line in &lines {
-        println!("{}", line.len());
-    }
     let width: usize = lines.iter().map(|l| l.len()).max().unwrap();
 
     let mut columns: Vec<String> = vec![String::new(); width];
